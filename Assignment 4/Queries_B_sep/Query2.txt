@@ -1,0 +1,26 @@
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/alejandro/ontologies/2021/A4#>
+
+INSERT {        
+    		?person a :Person;
+              	:personName ?personLabel .
+}
+WHERE{
+    SERVICE <https://query.wikidata.org/sparql>{
+        SELECT ?university ?person ?personLabel
+        WHERE {      
+            
+        #We collect all the universities from sweden
+        ?university wdt:P31 wd:Q3918 ; wdt:P17 wd:Q34.
+        #Alumni of swedish universities
+        ?person wdt:P69 ?university . 
+        
+      
+        ?person <http://www.w3.org/2000/01/rdf-schema#label> ?personLabel .
+ 
+        filter(lang(?personLabel) = "en")
+
+    	} 
+    }
+}

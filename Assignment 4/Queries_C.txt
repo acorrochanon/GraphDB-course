@@ -1,0 +1,37 @@
+#GROUP 34: ALEJANDRO CORROCHANO, YOSSRA GHARBI
+--------------------------------------------------------------
+QUERY1: #Find the names of people who work in the same place where they graduated
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/46739/ontologies/2021/4/partA#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+#Find the names of people who work in the same place where they graduated.
+SELECT ?name
+WHERE{
+    ?university rdf:type :University.
+    ?organisation rdf:type :Organisation.
+    ?person rdf:type :Person;
+            :personName ?name;
+            :alumnusOf ?university;
+            :employeeOf ?organisation.
+    FILTER (?university = ?organisation)
+}
+
+-------------------------------------------------------------------------
+QUERY2: #Find how many alumni are employed by each organisation.
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/46739/ontologies/2021/4/partA#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?organisation (COUNT(?name) AS ?var)
+WHERE{
+    ?university rdf:type :University.
+    ?organisation rdf:type :Organisation.
+    ?person rdf:type :Person;
+            :personName ?name;
+            :alumnusOf ?university;
+            :employeeOf ?organisation.
+}
+GROUP BY ?organisation

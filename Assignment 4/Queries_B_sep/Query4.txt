@@ -1,0 +1,34 @@
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/alejandro/ontologies/2021/A4#>
+
+INSERT {   
+    		?locationPerson a :Place;
+                :placeName ?locationPersonLabel ;
+                :countryName ?locationCountryLabel. 
+    
+    		?person a :Person;
+    			:bornIn ?locationPerson .
+}
+WHERE{
+    SERVICE <https://query.wikidata.org/sparql>{
+        SELECT ?university ?person ?inst ?locationPerson ?locationPersonLabel
+        ?locationCountry ?locationCountryLabel
+        WHERE {      
+            
+        #We collect all the universities from sweden
+        ?university wdt:P31 wd:Q3918 ; wdt:P17 wd:Q34.
+        #Alumni of swedish universities
+        ?person wdt:P69 ?university . 
+		#We get the birthplace and the country of the location  
+        ?person wdt:P19 ?locationPerson .
+        ?locationPerson wdt:P17 ?locationCountry .
+      
+        ?locationPerson <http://www.w3.org/2000/01/rdf-schema#label> ?locationPersonLabel . 
+        ?locationCountry <http://www.w3.org/2000/01/rdf-schema#label> ?locationCountryLabel .
+ 
+        filter(lang(?locationPersonLabel) = "en")
+        filter(lang(?locationCountryLabel) = "en")
+    	} 
+    }
+}

@@ -1,0 +1,151 @@
+------------all Swedish universities--------------------
+WITH '
+PREFIX sch: <http://schema.org/>
+CONSTRUCT{
+
+        ?university a sch:University;
+                      sch:name ?universityName;
+                      sch:yearFounded ?yearFounded;
+                      sch:locatedIn ?location .
+        ?location a sch:Place;
+                    sch:name ?locationName;
+                    sch:country ?countryName .
+}
+WHERE 
+{
+     ?university wdt:P31 wd:Q3918;
+                 wdt:P17 wd:Q34;
+                 rdfs:label ?universityName;
+                 wdt:P571 ?yearFounded;
+                 wdt:P276 ?location .
+     ?location rdfs:label ?locationName;
+               wdt:P17 ?country .
+     ?country rdfs:label ?countryName;
+  
+  FILTER(lang(?universityName) = "en")
+  FILTER(lang(?locationName) = "en") 
+  FILTER(lang(?countryName) = "en")
+     
+}
+' AS sparql
+CALL n10s.rdf.import.fetch(
+  "https://query.wikidata.org/sparql?query=" +  
+      apoc.text.urlencode(sparql),"JSON-LD", 
+    { headerParams: { Accept: "application/ld+json"} ,   
+      handleVocabUris: "IGNORE"})
+YIELD nodes, relationships 
+RETURN nodes, relationships
+
+-----------------all alumni of Swedish universities----------------------
+WITH '
+PREFIX sch: <http://schema.org/>
+CONSTRUCT{                
+        ?university a sch:University;
+                      sch:name ?universityName;
+                      sch:yearFounded ?yearFounded;
+                      sch:locatedIn ?location .
+        ?location a sch:Place;
+                    sch:name ?locationName;
+                    sch:country ?countryName .
+        ?alunmi a sch:Person;
+                  sch:name ?alunmiName; 
+                  sch:alunmsOf ?university;
+                  sch:bornIn ?placeOfBirth .   
+        ?placeOfBirth a sch:Place;
+                    sch:name ?placeOfBirthName;
+                    sch:country ?countryOfBirthName .         
+}
+WHERE 
+{
+     ?university wdt:P31 wd:Q3918;
+                 wdt:P17 wd:Q34;
+                 rdfs:label ?universityName;
+                 wdt:P571 ?yearFounded;
+                 wdt:P276 ?location .
+     ?location rdfs:label ?locationName;
+               wdt:P17 ?country .
+     ?country rdfs:label ?countryName.
+  
+     ?alunmi wdt:P69 ?university;
+             rdfs:label ?alunmiName;
+             wdt:P19 ?placeOfBirth .
+     ?placeOfBirth rdfs:label ?placeOfBirthName;
+                   wdt:P17 ?countryOfBirth .
+     ?countryOfBirth rdfs:label ?countryOfBirthName.
+              
+  
+  FILTER(lang(?universityName) = "en")
+  FILTER(lang(?locationName) = "en") 
+  FILTER(lang(?countryName) = "en")
+  FILTER(lang(?alunmiName) = "en")
+  FILTER(lang(?placeOfBirthName) = "en")
+  FILTER(lang(?countryOfBirthName) = "en")
+}
+' AS sparql
+CALL n10s.rdf.import.fetch(
+  "https://query.wikidata.org/sparql?query=" +  
+      apoc.text.urlencode(sparql),"JSON-LD", 
+    { headerParams: { Accept: "application/ld+json"} ,   
+      handleVocabUris: "IGNORE"})
+YIELD nodes, relationships 
+RETURN nodes, relationships
+
+------------------all organisations (universities and others) where alumni of Swedish universities are employed----------------------------------
+WITH '
+PREFIX sch: <http://schema.org/>
+CONSTRUCT{                
+        ?university a sch:University;
+                      sch:name ?universityName;
+                      sch:yearFounded ?yearFounded;
+                      sch:locatedIn ?location .
+        ?location a sch:Place;
+                    sch:name ?locationName;
+                    sch:country ?countryName .
+        ?alunmi a sch:Person;
+                  sch:name ?alunmiName; 
+                  sch:alunmsOf ?university;
+                  sch:bornIn ?placeOfBirth;
+                  sch:employeeOf ?employer .
+        ?placeOfBirth a sch:Place;
+                    sch:name ?placeOfBirthName;
+                    sch:country ?countryOfBirthName .  
+        ?employer a sch:Organisation;
+                  sch:name ?OrganisationName; 
+        
+}
+WHERE 
+{
+     ?university wdt:P31 wd:Q3918;
+                 wdt:P17 wd:Q34;
+                 rdfs:label ?universityName;
+                 wdt:P571 ?yearFounded;
+                 wdt:P276 ?location .
+     ?location rdfs:label ?locationName;
+               wdt:P17 ?country .
+     ?country rdfs:label ?countryName.
+     ?alunmi wdt:P69 ?university;
+             rdfs:label ?alunmiName;
+             wdt:P19 ?placeOfBirth;
+             wdt:P108 ?employer .
+     ?employer rdfs:label ?OrganisationName .
+     ?placeOfBirth rdfs:label ?placeOfBirthName;
+                   wdt:P17 ?countryOfBirth .
+     ?countryOfBirth rdfs:label ?countryOfBirthName.
+              
+  
+  FILTER(lang(?universityName) = "en")
+  FILTER(lang(?locationName) = "en") 
+  FILTER(lang(?countryName) = "en")
+  FILTER(lang(?alunmiName) = "en")
+  FILTER(lang(?placeOfBirthName) = "en")
+  FILTER(lang(?countryOfBirthName) = "en")
+  FILTER(lang(?OrganisationName) = "en")
+}
+' AS sparql
+CALL n10s.rdf.import.fetch(
+  "https://query.wikidata.org/sparql?query=" +  
+      apoc.text.urlencode(sparql),"JSON-LD", 
+    { headerParams: { Accept: "application/ld+json"} ,   
+      handleVocabUris: "IGNORE"})
+YIELD nodes, relationships 
+RETURN nodes, relationships

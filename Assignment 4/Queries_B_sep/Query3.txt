@@ -1,0 +1,35 @@
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/alejandro/ontologies/2021/A4#>
+
+INSERT {   
+			?inst a :University;
+         		:organisationName ?instLabel ;
+           		:yearFounded ?instYearFoundedLabel.
+    			
+    		?person a :Person;
+              	:personName ?personLabel ;
+               	:alumnusOf ?inst .
+}
+WHERE{
+    SERVICE <https://query.wikidata.org/sparql>{
+        SELECT ?university ?person ?personLabel ?inst ?instLabel (year(?instYearFounded) as ?instYearFoundedLabel)
+        WHERE {      
+            
+        #We collect all the universities from sweden
+        ?university wdt:P31 wd:Q3918 ; wdt:P17 wd:Q34.
+        #Alumni of swedish universities
+        ?person wdt:P69 ?university . 
+        #Institutions in which alumnis were educated at 
+        ?person wdt:P69 ?inst .
+        #We might find universities where they studied apart from the swedish ones, so the name and year founded is required as well
+        ?inst wdt:P571 ?instYearFounded .
+      
+        ?person <http://www.w3.org/2000/01/rdf-schema#label> ?personLabel .
+        ?inst <http://www.w3.org/2000/01/rdf-schema#label> ?instLabel .
+            
+        filter(lang(?personLabel) = "en")
+        filter(lang(?instLabel) = "en")
+    	} 
+    }
+}

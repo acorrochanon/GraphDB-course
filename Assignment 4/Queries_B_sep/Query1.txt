@@ -1,0 +1,35 @@
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/alejandro/ontologies/2021/A4#>
+
+INSERT {
+    		?placeName a :Place;
+                 :placeName ?placeNameLabel ;
+                 :countryName ?countryNameLabel . 
+    
+    		?university a :University;
+                :organisationName ?universityLabel ;
+            	:yearFounded ?yearfoundedLabel ; 
+    			:locatedIn ?placeName . 
+    	
+}
+WHERE{
+    SERVICE <https://query.wikidata.org/sparql>{
+        SELECT ?university ?universityLabel (year(?yearfounded) as ?yearfoundedLabel) ?placeName ?placeNameLabel ?countryNameLabel
+        WHERE {      
+            
+        #We collect all the universities from sweden
+        ?university wdt:P31 wd:Q3918 ; wdt:P17 wd:Q34; wdt:P571 ?yearfounded .      
+        ?university wdt:P276 ?placeName .
+    	?placeName wdt:P17 ?countryName .
+        
+        ?university <http://www.w3.org/2000/01/rdf-schema#label> ?universityLabel . 
+        ?placeName <http://www.w3.org/2000/01/rdf-schema#label> ?placeNameLabel . 
+        ?countryName <http://www.w3.org/2000/01/rdf-schema#label> ?countryNameLabel . 
+        
+        filter(lang(?universityLabel) = "en")
+        filter(lang(?placeNameLabel) = "en")
+        filter(lang(?countryNameLabel) = "en")
+    	} 
+    }
+}

@@ -1,0 +1,39 @@
+PREFIX wd: <http://www.wikidata.org/entity/> 
+PREFIX wdt: <http://www.wikidata.org/prop/direct/> 
+PREFIX : <http://www.semanticweb.org/alejandro/ontologies/2021/A4#>
+
+
+INSERT {   
+    		?locationEmployer a :Place;
+                :placeName ?locationEmployerLabel ;
+                :countryName ?countryEmployerLabel .
+    
+    		?employer a :Organisation;
+                :locatedIn ?locationEmployer.
+}
+WHERE{
+    SERVICE <https://query.wikidata.org/sparql>{
+        SELECT ?university ?person ?employer ?employerLabel ?locationEmployer ?locationEmployerLabel ?countryEmployer ?countryEmployerLabel
+        WHERE {      
+            
+        #We collect all the universities from sweden
+        ?university wdt:P31 wd:Q3918 ; wdt:P17 wd:Q34.
+        #Alumni of swedish universities
+        ?person wdt:P69 ?university . 
+        #Employers of universities alumni
+        ?person wdt:P108 ?employer .
+        #We retrieve the location of each employer
+        ?employer wdt:P276 ?locationEmployer .
+      	#We now collect the countries of the locations 
+        ?locationEmployer wdt:P17 ?countryEmployer .
+            
+        ?employer <http://www.w3.org/2000/01/rdf-schema#label> ?employerLabel . 
+ 		?locationEmployer <http://www.w3.org/2000/01/rdf-schema#label> ?locationEmployerLabel . 
+        ?countryEmployer <http://www.w3.org/2000/01/rdf-schema#label> ?countryEmployerLabel . 
+            
+        filter(lang(?employerLabel) = "en")
+        filter(lang(?locationEmployerLabel) = "en")
+        filter(lang(?countryEmployerLabel) = "en")
+    	} 
+    }
+}

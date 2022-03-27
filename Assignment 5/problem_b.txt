@@ -1,0 +1,11 @@
+//Query1: find people who studied in the Uiversity of Gothenburg
+
+MATCH (p:Person)
+WHERE exists((p)-[:alunmsOf]->(:University {name: 'University of Gothenburg'}))
+RETURN p
+---------------------------------------------------------------------------------------
+//Query2: find which people are working in organisations that are located in Gothenburg
+
+MATCH (p:Person)-[r:employeeOf]->(org:Organisation)
+WHERE exists((org)-[:locatedIn]->(:Place {name: 'Gothenburg'}))
+RETURN p, r, org
